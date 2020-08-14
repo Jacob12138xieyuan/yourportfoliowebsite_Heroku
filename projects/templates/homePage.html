@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+{% load static %}
+
+{% include "head.html" %}
+
+<style>
+.greeting {
+  font-size: 18px;
+  color: #fff;
+}
+.logout {
+  font-size: 20px;
+  color: azure;
+}
+.avatar {
+  vertical-align: middle;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+}
+.avatar_big {
+  vertical-align: middle;
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+}
+</style>
+
+<body>
+  <header>
+    <div class="collapse bg-dark" id="navbarHeader">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-8 col-md-7 py-4">
+            <h4 class="text-white">About</h4>
+            <p class="text-muted">This is XIE YUAN's personal portfolio website. Here you can know more about his personal information and what he has been doing recently. </p>
+          </div>
+          <div class="col-sm-4 offset-md-1 py-4">
+            <h4 class="text-white">Contact</h4>
+            <ul class="list-unstyled">
+              <li><a href={{userProfile.instagram}} class="text-white">Follow on Instagram</a></li>
+              <li><a href={{userProfile.facebook}} class="text-white">Like on Facebook</a></li>
+              <li><a href={{userProfile.linkedin}} class="text-white">Connect on LinkedIn</a></li>
+              <li><a href="mailto:{{userProfile.email}}" class="text-white">Email me</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="navbar navbar-dark bg-dark shadow-sm">
+      <div class="container d-flex justify-content-between">
+        <a href="{% url 'homePage' %}" class="navbar-brand d-flex align-items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor"
+            stroke-linecap="round" stroke-linejoin="round" stroke-width="2" aria-hidden="true" class="mr-2"
+            viewBox="0 0 24 24" focusable="false">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+            <circle cx="12" cy="13" r="4" /></svg>
+          <strong>HOME</strong>
+        </a>
+        {% if request.user.is_authenticated %}
+        <span class="greeting">Hello, {{ request.user.userprofile.fullName }}!</span>
+        {% else %}
+        <span class="greeting">Hello, XIE YUAN!</span>
+        {% endif %}
+        <div>
+          {% if request.user.is_authenticated %}
+          <span><a class="logout" href="{% url 'logoutUser' %}">Logout</a></span> 
+          <span class="logout"> | </span>
+          <span><a class="logout" href="{% url 'editProfile'%}"><img class='avatar' src="{{ userProfile.profileImage.url }}"></a></span> 
+          {% else %}
+          <span><a class="logout" href="{% url 'loginPage' %}">Login</a></span>
+          <span class="logout"> | </span>
+          <span><a class="logout" href="{% url 'registerPage' %}">Sign up</a></span>
+          {% endif %}
+          
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader"
+            aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main role="main">
+
+    <section class="jumbotron text-center">
+      <div class="container">
+        <h1>{{ userProfile.fullName }}</h1>
+        <p class="text-black-80" style="font-size: 1.5rem;">
+          {{ userProfile.profileSummary }}
+        </p>
+        <br>
+        
+        <img src="{{ userProfile.profileImage.url }}" class="avatar_big"></img>
+        <br>
+        <br>
+        <br>
+        <p>
+          <a href="{% url 'createPage' %}" class="btn btn-primary my-2">Create new project</a>
+          <a href={{userProfile.github}} class="btn btn-primary my-2">View my Github</a> 
+        </p>
+        <br>
+        <hr>
+        <p class="text-black-80" style="font-size: 1.2rem; font-weight: 500;">My technical skills are:</p>
+        <p class="text-black-80" style="font-size: 1rem;">{{ userProfile.skills }}</p>
+           
+        <hr>
+      </div>
+    </section>
+
+    <div class="album py-5 bg-light">
+      <div class="container">
+        <div class="row">
+          {% for project in projects %}
+          <div class="col-md-4">
+            <div class="card mb-4 shadow-sm">
+              <a href="{% url 'detailPage' project.id %}">
+                <img class="card-img-top" src="{{ project.image.url }}">
+              </a>
+              <div class="card-body">
+                <p class="card-text" style="font-size: 1.3rem; font-weight:500;">{{ project.name }}</p>
+                <hr>
+                <p class="card-text">{{ project.summary }}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="btn-group">
+                    <a href="{% url 'editPage' project.id %}">
+                      <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+                    </a>    
+                  </div>
+                  <small class="text-muted">{{ project.submission_date|timesince }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="text-muted">
+    <div class="container">
+      <p class="float-right">
+        <a href="#">Back to top</a>
+      </p>
+      <p style="text-align: center;">Copy Right &copy; yourportfolio.com 2020</p>
+    </div>
+  </footer>
+  <script src="{% static 'jquery-3.5.1.min.js' %}"></script>
+  <script src="{% static 'popper.min.js' %}"></script>
+  <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+</html>
